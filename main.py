@@ -2,13 +2,14 @@
 import openpyxl as opx
 import csv
 
-xls_name = "C:\\Users\\saara\\OneDrive\\Töölaud\\Rakendusgeoloogia\\Ailar\\py\\autotext\\sample\\Geoloogiline lõige koos statistikaga.xlsx"
+xls_path = "C:\\Users\\saara\\OneDrive\\Töölaud\\Rakendusgeoloogia\\Ailar\\py\\autotext\\sample\\Geoloogiline lõige koos statistikaga.xlsx"
+kihid_path = "C:\\Users\\saara\\OneDrive\\Töölaud\\Rakendusgeoloogia\\Ailar\\py\\autotext\\sample\\Kihtide alus.txt"
 dataframe = []  # declare empty df
 
 
 # reads data
 
-workbook = opx.load_workbook(xls_name, read_only=True, data_only=True)
+workbook = opx.load_workbook(xls_path, read_only=True, data_only=True)
 sheet = workbook.active
 
 for row in sheet.values:
@@ -40,8 +41,36 @@ abs_m =  dataframe_filtered[split_index[2]:split_index[3]]
 kaetud_nr =  dataframe_filtered[split_index[3]:split_index[4]]
 esines_nr =  dataframe_filtered[split_index[4]:]
 
-#    print(len(paksus_m), len(sygavus_m), len(abs_m), len(kaetud_nr), len(esines_nr))
-#    print(kaetud_nr)
+# make lists to index
+UP_list = kaetud_nr[0][4:-1] # just in case
+layer_list = []
+for row in kaetud_nr:
+    if row[0] is not None:
+        layer_list.append(row[0])
+
+# get layer description
+kihi_kirjeldus = []
+with open(kihid_path, "r", encoding="UTF-8") as kihid:
+    for kiht in kihid:
+        kiht = kiht.strip()
+        kiht = kiht.rsplit(". ")
+        if len(kiht) > 1:
+            kihi_kirjeldus.append(kiht)
+print(kihi_kirjeldus)
+
+
+# text gen
+
+
+"""
+KIHT 6, Kruusane (mölline) eriteraline LIIV (gr(si)Sa, fglIII): 
+PA-1...-2, PA-8 ja PA-10 alal avati täitepinnase (kiht 3) või vähese orgaanilise aine sisaldusega 
+liivase MÖLLI (kiht 5) all, teepinnast 0,40...0,45 meetri sügavusel 0,20...1,10 meetri paksune kruusase (möllise) 
+eriteralise liiva kiht, abs. kõrgusel 62,63...66,10 meetrit. Kiht on helepruun, kesktihe kuni tihe, 
+niiske, sisaldab jämepurdu 15...20%. 
+Kiht on mõõdukalt külmaohtlik ning ei täida dreenimistingimusi.
+"""
+
 
 def write_text(table):
     # Creates file and fills it with necessary info
