@@ -1,11 +1,23 @@
 # This script reads text from statistics and creates paragraphs of text
 import openpyxl as opx
 import csv
+from pathlib import WindowsPath
 
-xls_path = "C:\\Users\\saara\\OneDrive\\Töölaud\\Rakendusgeoloogia\\Ailar\\py\\autotext\\sample\\Geoloogiline lõige koos statistikaga.xlsx"
-kihid_path = "C:\\Users\\saara\\OneDrive\\Töölaud\\Rakendusgeoloogia\\Ailar\\py\\autotext\\sample\\Kihtide alus.txt"
+# xls_path = "C:\\Users\\saara\\OneDrive\\Töölaud\\Rakendusgeoloogia\\Ailar\\py\\autotext\\sample\\Geoloogiline lõige koos statistikaga.xlsx"
+# kihid_path = "C:\\Users\\saara\\OneDrive\\Töölaud\\Rakendusgeoloogia\\Ailar\\py\\autotext\\sample\\Kihtide alus.txt"
+
 dataframe = []  # declare empty df
 
+# Ask for folder and generate full file paths
+workfolder_path = input("Sisesta töökausta asukoht (shift+parem klahv -> Copy as path): ")
+print(workfolder_path)
+xls_path = workfolder_path[0:-1]+"\\Geoloogiline lõige koos statistikaga.xlsx"+"\""
+kihid_path = workfolder_path[0:-1]+"\\Kihtide alus.txt"+"\""
+xls_path = WindowsPath(xls_path.replace('"', ''))
+kihid_path = WindowsPath(kihid_path.replace('"', ''))
+
+print(xls_path)
+print(kihid_path)
 
 # reads data
 
@@ -56,7 +68,7 @@ with open(kihid_path, "r", encoding="UTF-8") as kihid:
         kiht = kiht.rsplit(". ")
         if len(kiht) > 1:
             kihi_kirjeldus.append(kiht)
-print(kihi_kirjeldus)
+
 
 
 # text gen
