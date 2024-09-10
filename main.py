@@ -1,6 +1,7 @@
 # This script reads text from statistics and creates paragraphs of text
 # TODO: make it pretty again
 # TODO: cases of nouns
+# TODO: Preserve layer types
 from time import process_time_ns
 
 import openpyxl as opx
@@ -52,8 +53,7 @@ for i in range (len(dataframe_filtered)-1):
             split_index.append(i)
     except: pass
 
-UP_list = dataframe_filtered[split_index[1]]
-UP_list = UP_list[4:-3]
+UP_list = dataframe_filtered[split_index[1]][4:-3]
 paksus_m = dataframe_filtered[1:split_index[1]-3]
 sygavus_m = dataframe_filtered[split_index[1]+1:split_index[2]]
 abs_m =  dataframe_filtered[split_index[2]+1:split_index[3]]
@@ -65,7 +65,7 @@ for loetelu in kaetud_loetelu:
         loetelu.remove("0")
     except: pass
 
-esines_nr =  dataframe_filtered[split_index[4]+1:]
+esines_nr = dataframe_filtered[split_index[4]+1:]
 esines_loetelu = [(str(item[-1])).split(",") for item in esines_nr]
 
 # make lists to index
@@ -105,24 +105,24 @@ for i in range(len(pindmine_kiht)):
 text_list = [[] for _ in range(len(layer_list))]
 
 for i in range(len(layer_list)):
-    text_list[i].append("KIHT " + ", ".join(kihi_kirjeldus[i]) + ": ")
+    text_list[i].append("KIHT %s: " % (", ".join(kihi_kirjeldus[i])))
     if len(pindmine_kiht[i]) > 0:
-        text_list[i].append("Uuringualal on kiht pindmiseks kihiks uuringupunktide " + ", ".join(pindmine_kiht[i]) + " alal ")
+        text_list[i].append("Uuringualal on kiht pindmiseks kihiks uuringupunktide %s alal " % (", ".join(pindmine_kiht[i])))
 
     paksus_min = paksus_m[i][-2]
     paksus_max = paksus_m[i][-1]
     if paksus_min == paksus_max:
-        text_list[i].append(str(paksus_max) + " paksuse kihina. ")
+        text_list[i].append("%s paksuse kihina. " %(str(paksus_max)))
     else:
-        text_list[i].append(str(paksus_min) + " kuni " + str(paksus_max) + " m paksuse kihina. ")
+        text_list[i].append("%s kuni %s m paksuse kihina. " % (str(paksus_min), str(paksus_max)))
 
     if len(esines_loetelu[i]) > 0:
-        text_list[i].append("Kiht avati uuringupunktide " + ", ".join(esines_loetelu[i]) + " alal kihtide ")
+        text_list[i].append("Kiht avati uuringupunktide %s alal kihtide " % (", ".join(esines_loetelu[i])))
         appstr = []
         for kiht in kaetud_loetelu[i]:
             kirjeldus_index = kihtide_loetelu.index(kiht)
-            appstr.append(kiht + " (" + kihi_kirjeldus[kirjeldus_index][1] + ") ")
-        appstr = ", ".join(appstr) + "all "
+            appstr.append("%s (%s)" % (kiht, kihi_kirjeldus[kirjeldus_index][1]))
+        appstr = "%s all " % (", ".join(appstr))
         text_list[i].append(appstr)
 
     sygavus_min = sygavus_m[i][-2]
@@ -132,40 +132,33 @@ for i in range(len(layer_list)):
 
     if sygavus_max > 0:
         if sygavus_min == sygavus_max:
-            text_list[i].append("Kiht lasub maapinnast " + str(sygavus_max) + " m sügavusel ")
+            text_list[i].append("Kiht lasub maapinnast %s m sügavusel " % (str(sygavus_max)))
         else:
-            text_list[i].append("Kiht lasub maapinnast " + str(sygavus_min) + " kuni " + str(sygavus_max) + " m sügavusel, ")
+            text_list[i].append("Kiht lasub maapinnast %s kuni %s m sügavusel, " % (str(sygavus_min), str(sygavus_max)))
         if abs_min == abs_max:
-            text_list[i].append("abs. kõrgusel " + str(abs_max) + " m.")
+            text_list[i].append("abs. kõrgusel %s m." % (str(abs_max)))
         else:
-            text_list[i].append("abs. kõrgusel " + str(abs_min) + " kuni " + str(abs_max) + " m.")
+            text_list[i].append("abs. kõrgusel %s kuni %s m." % (str(abs_min), str(abs_max)))
+
+text_list.insert(0, ("1. SELETUSKIRI\n"+ #Lisab päise
+                     "1.1. ÜLDOSA\n\n"+
+                     "[ASUKOHT] teostati geoloogilised väliuuringud [KUUPÄEV]. Uuringud teostati mahus ja asukohas, mis olid Tellija poolt ette antud.\n\n"+
+                     "Välitööde käigus puuriti puurmasinaga [PUURMASIN] %s puurauku, sügavusega [SÜGAVUS].\n\n" % (str(len(UP_list))) +
+                     "Uuringupunktid mõõdeti välja mõõdulindiga alusplaanil märgitud objektidest või märgiti maha GPS seadmega Garmin Montana 750i.\n\n"+
+                     "Kõrgusesse seoti uuringupunktid geoalusel näidatud kõrguspunktidest, kõrgused on EH2000 kõrgussüsteemis. Uuringupunktide koordinaadid, mis on võetud alusplaanilt, on L-EST97 koordinaatsüsteemis.\n\n"+
+                     "Töö on koostatud vastavalt EVS-EN ISO 14688-1:2018 Eesti Standardile „Geotehniline uurimine ja katsetamine. Osa 1: „Identifitseerimine ja kirjeldamine“ ning osa 2: „Liigituspõhimõtted“. Pinnastele on antud hinnangulised kategooriad A…D.\n\n"+
+                     "Uuringupunktide asukohad on näidatud asendiplaanidel, joonistel [JOONISED]. Pinnaste täpsed kirjeldused ja lasuvuspilt on toodud geoloogilistes tulpades ja joonistel [TULBAD].\n\n"+
+                     "1.2.GEOLOOGILINE EHITUS\n\n"+
+                     "Maastikulise liigituse järgi jääb uuringuala [PIIRKOND] piirkonda. Maapinna kõrgused jäid puuraukude suudmetel abs. kõrguste [KÕRGUSED] vahemikku.\n\n"+
+                     "Tee mulle ja täitepinnased (tIV):\n"
+))
+text_list.append("1.3. EHITUSGEOLOOGILISED TINGIMUSED")
 
 printlist = []
 for ln in text_list:
     printlist.append("".join(ln))
 
-#text_list = "\n".join(text_list)
-
-
 with open(out_path, "w", encoding="UTF-8") as output:
     output.write("\n\n".join(printlist))
-#print(sygavus_m[6])
-#print("".join(text_list[6]))
-"""
-*KIHT 6, Kruusane (mölline) eriteraline LIIV (gr(si)Sa, fglIII): #alus
-*PA-1...-2, PA-8 ja PA-10 alal avati #esines 
-täitepinnase (kiht 3) või vähese orgaanilise aine sisaldusega liivase MÖLLI (kiht 5) all, #kaetud
-teepinnast 0,40...0,45 meetri  #sygavus
-sügavusel 0,20...1,10 meetri paksune #paksus
-kruusase (möllise) eriteralise liiva kiht, #alus, käänamine?
-abs. kõrgusel 62,63...66,10 meetrit. #abs
-Kiht on helepruun, kesktihe kuni tihe, niiske, sisaldab jämepurdu 15...20%. #kirjaldusest
-Kiht on mõõdukalt külmaohtlik ning ei täida dreenimistingimusi. #???
-"""
-
-
-def write_text(table):
-    # Creates file and fills it with necessary info
-    pass
 
 
