@@ -105,40 +105,47 @@ for i in range(len(pindmine_kiht)):
 text_list = [[] for _ in range(len(layer_list))]
 
 for i in range(len(layer_list)):
+    paksus_min = str(paksus_m[i][-2]).replace(".",",")
+    paksus_max = str(paksus_m[i][-1]).replace(".",",")
     text_list[i].append("KIHT %s: " % (", ".join(kihi_kirjeldus[i])))
     if len(pindmine_kiht[i]) > 0:
         text_list[i].append("Uuringualal on kiht pindmiseks kihiks uuringupunktide %s alal " % (", ".join(pindmine_kiht[i])))
-
-    paksus_min = paksus_m[i][-2]
-    paksus_max = paksus_m[i][-1]
-    if paksus_min == paksus_max:
-        text_list[i].append("%s paksuse kihina. " %(str(paksus_max)))
+        if len(esines_loetelu[i]) > 0:
+            text_list[i].append("ja kiht avati uuringupunktide %s alal kihtide " % (", ".join(esines_loetelu[i])))
+            appstr = []
+            for kiht in kaetud_loetelu[i]:
+                kirjeldus_index = kihtide_loetelu.index(kiht)
+                appstr.append("%s (%s)" % (kiht, kihi_kirjeldus[kirjeldus_index][1].lower().partition(" (")[0]))
+            appstr = "%s all " % (", ".join(appstr))
+            text_list[i].append(appstr)
     else:
-        text_list[i].append("%s kuni %s m paksuse kihina. " % (str(paksus_min), str(paksus_max)))
-
-    if len(esines_loetelu[i]) > 0:
         text_list[i].append("Kiht avati uuringupunktide %s alal kihtide " % (", ".join(esines_loetelu[i])))
         appstr = []
         for kiht in kaetud_loetelu[i]:
             kirjeldus_index = kihtide_loetelu.index(kiht)
-            appstr.append("%s (%s)" % (kiht, kihi_kirjeldus[kirjeldus_index][1]))
+            appstr.append("%s (%s)" % (kiht, kihi_kirjeldus[kirjeldus_index][1].lower().partition(" (")[0]))
         appstr = "%s all " % (", ".join(appstr))
         text_list[i].append(appstr)
 
-    sygavus_min = sygavus_m[i][-2]
-    sygavus_max = sygavus_m[i][-1]
-    abs_min = abs_m[i][-2]
-    abs_max = abs_m[i][-1]
+    if paksus_min == paksus_max:
+        text_list[i].append("%s paksuse kihina. " %(paksus_max))
+    else:
+        text_list[i].append("%s kuni %s m paksuse kihina. " % (paksus_min, paksus_max))
 
-    if sygavus_max > 0:
+    sygavus_min = str(sygavus_m[i][-2]).replace(".",",")
+    sygavus_max = str(sygavus_m[i][-1]).replace(".",",")
+    abs_min = str(abs_m[i][-2]).replace(".",",")
+    abs_max = str(abs_m[i][-1]).replace(".",",")
+
+    if float(sygavus_max.replace(",",".")) > 0:
         if sygavus_min == sygavus_max:
-            text_list[i].append("Kiht lasub maapinnast %s m sügavusel " % (str(sygavus_max)))
+            text_list[i].append("Kiht lasub maapinnast %s m sügavusel " % sygavus_max)
         else:
-            text_list[i].append("Kiht lasub maapinnast %s kuni %s m sügavusel, " % (str(sygavus_min), str(sygavus_max)))
+            text_list[i].append("Kiht lasub maapinnast %s kuni %s m sügavusel, " % (sygavus_min, sygavus_max))
         if abs_min == abs_max:
-            text_list[i].append("abs. kõrgusel %s m." % (str(abs_max)))
+            text_list[i].append("abs. kõrgusel %s m." % abs_max)
         else:
-            text_list[i].append("abs. kõrgusel %s kuni %s m." % (str(abs_min), str(abs_max)))
+            text_list[i].append("abs. kõrgusel %s kuni %s m." % (abs_min, abs_max))
 
 text_list.insert(0, ("1. SELETUSKIRI\n"+ #Lisab päise
                      "1.1. ÜLDOSA\n\n"+
@@ -150,7 +157,7 @@ text_list.insert(0, ("1. SELETUSKIRI\n"+ #Lisab päise
                      "Uuringupunktide asukohad on näidatud asendiplaanidel, joonistel [JOONISED]. Pinnaste täpsed kirjeldused ja lasuvuspilt on toodud geoloogilistes tulpades ja joonistel [TULBAD].\n\n"+
                      "1.2.GEOLOOGILINE EHITUS\n\n"+
                      "Maastikulise liigituse järgi jääb uuringuala [PIIRKOND] piirkonda. Maapinna kõrgused jäid puuraukude suudmetel abs. kõrguste [KÕRGUSED] vahemikku.\n\n"+
-                     "Tee mulle ja täitepinnased (tIV):\n"
+                     "Tee mulle ja täitepinnased (tIV):"
 ))
 text_list.append("1.3. EHITUSGEOLOOGILISED TINGIMUSED")
 
