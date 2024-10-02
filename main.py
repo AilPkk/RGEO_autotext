@@ -1,25 +1,20 @@
 # This script reads text from statistics and creates paragraphs of text
-# TODO: make it pretty again
-# TODO: cases of nouns
-# TODO: Preserve layer types
-from time import process_time_ns
 
 import openpyxl as opx
 from pathlib import WindowsPath
 from string import digits
+from tkinter import Tk
+from tkinter.filedialog import askdirectory
 
-# xls_path = "C:\\Users\\saara\\OneDrive\\Töölaud\\Rakendusgeoloogia\\Ailar\\py\\autotext\\sample\\Geoloogiline lõige koos statistikaga.xlsx"
-# kihid_path = "C:\\Users\\saara\\OneDrive\\Töölaud\\Rakendusgeoloogia\\Ailar\\py\\autotext\\sample\\Kihtide alus.txt"
 
 dataframe = []  # declare empty df
 
 # Ask for folder and generate full file paths
-#workfolder_path = input("Sisesta töökausta asukoht (shift+parem klahv -> Copy as path): ")
-workfolder_path = "C:\\Users\\saara\\OneDrive\\Töölaud\\Rakendusgeoloogia\\Ailar\\py\\autotext\\samplee"
+workfolder_path = askdirectory(title='Vali kaust')
 
-xls_path = workfolder_path[0:-1]+"\\Geoloogiline lõige koos statistikaga.xlsx\""
-kihid_path = workfolder_path[0:-1]+"\\Kihtide alus.txt\""
-out_path = workfolder_path[0:-1]+"\\tulem.txt\""
+xls_path = workfolder_path+"\\Geoloogiline lõige koos statistikaga.xlsx\""
+kihid_path = workfolder_path+"\\Kihtide alus.txt\""
+out_path = workfolder_path+"\\tulem.txt\""
 xls_path = WindowsPath(xls_path.replace('"', ''))
 kihid_path = WindowsPath(kihid_path.replace('"', ''))
 out_path = WindowsPath(out_path.replace('"', ''))
@@ -35,14 +30,14 @@ for row in sheet.values:
 
 workbook.close()
 
-# cleanup
+# cleanup: delete empty columns from the end
 dataframe_filtered = [x for x in dataframe if x[3] is not None or x[1] is not None]
 for line in dataframe_filtered:
     while line[-1] is None:
         del line[-1]
 
 
-## sort data
+### sort data
 
 split_index = [0]
 table_headers = ["Teepinnast sügavus (m)", "Abs (m)", "Kaetud kihi nr", "Kiht esines puuraukudes "]
